@@ -5,4 +5,8 @@ export class CategoryServices {
     public create = async (data: categoryCreate) => {
         return await prisma.category.create({ data })
     }
+
+    public delete = async (id: number) => {
+        return await prisma.category.delete({ where: { id } });
+      };
 }

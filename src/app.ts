@@ -9,5 +9,4 @@ app.use(helmet());
 app.use(json());
 
 app.use("/tasks", taskRouter)
-
 app.use("/categories", categoryRouter)
