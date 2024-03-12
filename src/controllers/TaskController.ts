@@ -10,7 +10,7 @@ export class TaskController {
   };
 
   public findMany = async ({ query }: Request, res: Response) => {
-    const queryParms = query.title ? String(query.title) : undefined;
+    const queryParms = query.name ? String(query.name) : undefined;
     const taskList = await this.taskService.findMany(queryParms);
     return res.status(200).json(taskList);
   };
@@ -34,6 +34,6 @@ export class TaskController {
     const taskId = Number(req.params.id)
     await this.taskService.delete(taskId)
 
-    return res.status(200).json()
+    return res.status(204).json()
   }
 }

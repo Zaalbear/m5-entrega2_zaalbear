@@ -1,16 +1,18 @@
 import { taskCreate, taskUpdate } from "../interfaces/tasks.interfaces";
 import { prisma } from "../database/prisma";
+import { taskCreateSchema } from "../schemas/tasks.schemas";
 
 export class TaskService {
   public create = async (data: taskCreate) => {
-    return await prisma.task.create({ data });
+    const newTask = await prisma.task.create({ data });
+    return taskCreateSchema.parse(newTask)
   };
 
-  public findMany = async (title?: string) => {
-    if (title) {
+  public findMany = async (name?: string) => {
+    if (name) {
       return await prisma.task.findMany({
-        where: { title /*mode: "insensitive"*/ },
         include: { category: true },
+        where: { category: { name } /*mode: "insensitive"*/ }
       });
 
       // Por algum motivo o mode: "insensitive" está gritando um erro e eu não sei o motivo.

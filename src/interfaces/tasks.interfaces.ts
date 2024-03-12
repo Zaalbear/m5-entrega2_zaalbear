@@ -1,4 +1,5 @@
-import { Task } from "@prisma/client";
+import { z } from "zod";
+import { taskCreateSchema, taskUpdateSchema } from "../schemas/tasks.schemas";
 
-export type taskCreate = Omit<Task, "id" | "finished">
-export type taskUpdate = Omit<Task, "id">
+export type taskCreate = z.infer<typeof taskCreateSchema>
+export type taskUpdate = z.infer<typeof taskUpdateSchema>

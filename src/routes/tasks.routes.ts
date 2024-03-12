@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { TaskController } from "../controllers/TaskController";
+import { validate } from "../middlewares/validateTask.middleware";
+import { taskCreateSchema, taskUpdateSchema } from "../schemas/tasks.schemas";
 
 export const taskRouter = Router()
 const taskController = new TaskController();
 
-taskRouter.post("", taskController.create)
+taskRouter.post("", validate.validateTaskBody(taskCreateSchema), taskController.create)
 taskRouter.get("", taskController.findMany)
-taskRouter.get("/:id", taskController.findById)
-taskRouter.patch("/:id", taskController.update)
-taskRouter.delete('/:id', taskController.delete)
+taskRouter.get("/:id", validate.validateId, taskController.findById)
+taskRouter.patch("/:id", validate.validateId, validate.validateTaskBody(taskCreateSchema), taskController.update)
+taskRouter.delete('/:id', validate.validateId, taskController.delete)

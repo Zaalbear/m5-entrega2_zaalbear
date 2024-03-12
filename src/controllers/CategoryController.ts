@@ -13,6 +13,6 @@ export class CategoryController {
         const taskId = Number(req.params.id)
         await this.categoryService.delete(taskId)
     
-        return res.status(200).json()
+        return res.status(204).json()
       }
 }
