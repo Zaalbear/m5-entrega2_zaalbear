@@ -1,13 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import { AnyZodObject } from "zod";
 import { prisma } from "../database/prisma";
+import { taskUpdateSchema } from "../schemas/tasks.schemas";
 
 class ValidateTask {
   public validateTaskBody =
     (schema: AnyZodObject) =>
-    (req: Request, _: Response, next: NextFunction) => {
+    (req: Request, res: Response, next: NextFunction) => {
       req.body = schema.parse(req.body);
 
+      if (!req.body.categoryId){
+        return res.status(400).json({ massage: "Category has been not declared"})
+      }
+  
       return next();
     };
 
@@ -42,6 +47,22 @@ class ValidateTask {
     return next();
 
   }
+
+  public validateTaskUpdateBody =
+  (schema: AnyZodObject) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    req.body = schema.parse(req.body);
+
+    if (req.body.categoryId){
+      const foundCategory = await prisma.category.findFirst({ where: { id: req.body.categoryId}})
+
+      if (!foundCategory){
+        return res.status(404).json({ massage: "Category not found"})
+      }
+    }
+
+    return next();
+  };
 }
 
 export const validate = new ValidateTask();

@@ -22,7 +22,7 @@ export class TaskService {
   };
 
   public findById = async (id: number) => {
-    return await prisma.task.findFirst({ where: { id } });
+    return await prisma.task.findFirst({ where: { id }, include: { category: true } });
   };
 
   public update = async (id: number, data: taskUpdate) => {

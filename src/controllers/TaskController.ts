@@ -6,8 +6,10 @@ export class TaskController {
   private taskService = new TaskService();
 
   public create = async (req: Request, res: Response) => {
-    const newTask = await this.taskService.create(req.body);
-    return res.status(201).json(newTask);
+    await this.taskService.create(req.body);
+
+    const response = await prisma.task.findFirst({ where: { id: res.locals.id }})
+    return res.status(201).json(response);
   };
 
   public findMany = async ({ query }: Request, res: Response) => {
