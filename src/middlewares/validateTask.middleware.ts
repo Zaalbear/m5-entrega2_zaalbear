@@ -16,9 +16,9 @@ class ValidateTask {
     res: Response,
     next: NextFunction
   ) => {
-    const { taskId } = req.params;
+    const { id } = req.params;
     const foundTask = await prisma.task.findFirst({
-      where: { id: Number(taskId) },
+      where: { id: Number(id) },
     });
 
     if (!foundTask) {
@@ -27,6 +27,39 @@ class ValidateTask {
 
     return next();
   };
+
+  public validateCategoryId = async (req: Request, res: Response, next: NextFunction) => {
+    const { categoryId } = req.body;
+
+    const foundCategory = await prisma.category.findFirst({
+      where: { id: Number(categoryId) },
+    });
+
+    if (!foundCategory) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    return next();
+
+  }
+
+  public validateCategoryName = async (req: Request, res: Response, next: NextFunction) => {
+    const queryParams = req.params.value;
+
+    const foundCategory = await prisma.category.findFirst({
+      where: { name: queryParams },
+    });
+
+    console.log(foundCategory);
+    
+
+    if (!foundCategory) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    return next();
+
+  }
 }
 
 export const validate = new ValidateTask();

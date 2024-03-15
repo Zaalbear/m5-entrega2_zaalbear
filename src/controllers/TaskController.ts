@@ -10,9 +10,9 @@ export class TaskController {
   };
 
   public findMany = async ({ query }: Request, res: Response) => {
-    const queryParms = query.name ? String(query.name) : undefined;
+    const queryParms = query.category ? String(query.category) : undefined;
     const taskList = await this.taskService.findMany(queryParms);
-    return res.status(200).json(taskList);
+    return res.status(200).json({taskList});
   };
 
   public findById = async (req: Request, res: Response) => {

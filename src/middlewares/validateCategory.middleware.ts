@@ -16,9 +16,9 @@ class ValidateCategory {
       res: Response,
       next: NextFunction
     ) => {
-      const { categoryId } = req.params;
+      const { id } = req.params;
       const foundCategory = await prisma.category.findFirst({
-        where: { id: Number(categoryId) },
+        where: { id: Number(id) },
       });
   
       if (!foundCategory) {

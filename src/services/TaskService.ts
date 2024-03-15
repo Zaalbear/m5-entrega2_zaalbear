@@ -12,7 +12,7 @@ export class TaskService {
     if (name) {
       return await prisma.task.findMany({
         include: { category: true },
-        where: { category: { name } /*mode: "insensitive"*/ }
+        where: { category: { name } /*mode: "insensitive"*/ },
       });
 
       // Por algum motivo o mode: "insensitive" está gritando um erro e eu não sei o motivo.
