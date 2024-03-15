@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { TaskService } from "../services/TaskService";
+import { prisma } from "../database/prisma";
 
 export class TaskController {
   private taskService = new TaskService();
@@ -10,8 +11,19 @@ export class TaskController {
   };
 
   public findMany = async ({ query }: Request, res: Response) => {
-    const queryParms = query.category ? String(query.category) : undefined;
-    const taskList = await this.taskService.findMany(queryParms);
+    const queryParams = query.category ? String(query.category) : undefined;
+    const taskList = await this.taskService.findMany(queryParams);
+
+    if (queryParams){
+      const foundCategory = await prisma.task.findFirst({
+        where: { category: { name: String(queryParams) } },
+      });
+      
+      if (!foundCategory) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+    }
+    
     return res.status(200).json({taskList});
   };
 

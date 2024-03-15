@@ -42,24 +42,6 @@ class ValidateTask {
     return next();
 
   }
-
-  public validateCategoryName = async (req: Request, res: Response, next: NextFunction) => {
-    const queryParams = req.params.value;
-
-    const foundCategory = await prisma.category.findFirst({
-      where: { name: queryParams },
-    });
-
-    console.log(foundCategory);
-    
-
-    if (!foundCategory) {
-      return res.status(404).json({ message: "Category not found" });
-    }
-
-    return next();
-
-  }
 }
 
 export const validate = new ValidateTask();
