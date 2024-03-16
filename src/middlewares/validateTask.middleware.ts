@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { AnyZodObject } from "zod";
 import { prisma } from "../database/prisma";
-import { taskUpdateSchema } from "../schemas/tasks.schemas";
 
 class ValidateTask {
   public validateTaskBody =
