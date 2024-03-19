@@ -6,9 +6,7 @@ export class TaskController {
   private taskService = new TaskService();
 
   public create = async (req: Request, res: Response) => {
-    await this.taskService.create(req.body);
-
-    const response = await prisma.task.findFirst({ where: { id: res.locals.id }})
+    const response = await this.taskService.create(req.body);
     return res.status(201).json(response);
   };
 
@@ -18,7 +16,7 @@ export class TaskController {
 
     if (queryParams){
       const foundCategory = await prisma.task.findFirst({
-        where: { category: { name: String(queryParams) } },
+        where: { category: { name: String(queryParams) }, },
       });
       
       if (!foundCategory) {
@@ -26,7 +24,7 @@ export class TaskController {
       }
     }
     
-    return res.status(200).json({taskList});
+    return res.status(200).json(taskList);
   };
 
   public findById = async (req: Request, res: Response) => {

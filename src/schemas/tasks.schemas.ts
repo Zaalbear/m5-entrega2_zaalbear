@@ -8,6 +8,6 @@ export const taskSchema = z.object({
   categoryId: z.number().nullish(),
 });
 
-export const taskCreateSchema = taskSchema.omit({ id: true, finished: true })
+export const taskCreateSchema = taskSchema.omit({ id: true, finished: true }).partial({ categoryId: true })
 
 export const taskUpdateSchema = taskSchema.partial()

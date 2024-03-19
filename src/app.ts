@@ -1,3 +1,4 @@
+import "express-async-errors"
 import express, { json } from "express";
 import helmet from "helmet";
 import { taskRouter } from "./routes/tasks.routes";
