@@ -9,5 +9,4 @@ export const categorySchema = z.object({
 
 export const categoryCreateSchema = categorySchema.omit({
   id: true,
-  userId: true,
 });

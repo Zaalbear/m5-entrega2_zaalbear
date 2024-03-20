@@ -13,7 +13,5 @@ export class CategoryServices {
     if (findTask) {
       return await prisma.category.delete({ where: { id } });
     }
-
-    throw new AppError("This user is not the task owner", 403);
   };
 }

@@ -5,8 +5,7 @@ export class CategoryController {
   private categoryService = new CategoryServices();
 
   public create = async (req: Request, res: Response) => {
-    const body = { ...req.body, userId: res.locals.token.id };
-    const newCategory = await this.categoryService.create(body);
+    const newCategory = await this.categoryService.create(req.body);
     return res.status(201).json(newCategory);
   };
 
@@ -14,8 +13,12 @@ export class CategoryController {
     const taskId = Number(req.params.id);
     const userId = res.locals.token.id;
 
-    await this.categoryService.delete(taskId, userId);
+    const response = await this.categoryService.delete(taskId, userId);
 
-    return res.status(204).json();
+    if (response){
+      return res.status(204).json();
+    }
+
+    return res.status(403).json({ message: "This user is not the category owner" })
   };
 }
