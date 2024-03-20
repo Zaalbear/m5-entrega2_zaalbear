@@ -8,10 +8,13 @@ export class CategoryServices {
   };
 
   public delete = async (id: number, userId: number) => {
-    const findTask = await prisma.category.findFirst({ where: { id, userId } });
+    const findCategory = await prisma.category.findFirst({ where: { id, userId } });
 
-    if (findTask) {
-      return await prisma.category.delete({ where: { id } });
-    }
+    if (findCategory) {
+        await prisma.category.delete({ where: { id } });
+        return true; // Ou uma mensagem de sucesso, se preferir
+    } 
+    
+    return null;
   };
 }

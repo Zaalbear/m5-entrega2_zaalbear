@@ -11,7 +11,6 @@ taskRouter.post(
   "",
   validateToken.validateToken,
   validate.validateTaskBody(taskCreateSchema),
-  validate.validateCategoryId,
   taskController.create
 );
 taskRouter.get("", validateToken.validateToken, taskController.findMany);

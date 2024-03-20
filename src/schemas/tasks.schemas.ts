@@ -13,7 +13,6 @@ export const taskSchema = z.object({
 export const taskCreateSchema = taskSchema.omit({
   id: true,
   finished: true,
-  userId: true,
 }).partial({ categoryId: true });
 
 export const taskUpdateSchema = taskSchema.partial();

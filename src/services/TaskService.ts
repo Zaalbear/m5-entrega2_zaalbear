@@ -1,20 +1,56 @@
-import { taskUpdate } from "../interfaces/tasks.interfaces";
+import { taskCreate, taskUpdate } from "../interfaces/tasks.interfaces";
 import { prisma } from "../database/prisma";
 import { AppError } from "../errors/appError";
 
 export class TaskService {
-  public create = async (data: any) => {
-    return await prisma.task.create({ data });
+  public create = async (
+    data: taskCreate,
+    userId: number,
+    categoryId?: number
+  ) => {
+    const user = await prisma.user.findFirst({ where: { id: userId } });
+
+    if (!user) {
+      return null;
+    }
+
+    if (!categoryId) {
+      const taskData = { ...data, userId: user.id };
+      return await prisma.task.create({ data: taskData });
+    }
+
+    const category = await prisma.category.findFirst({
+      where: {
+        id: categoryId,
+        userId: user.id,
+      },
+    });
+
+    if (!category) {
+      return null;
+    }
+
+    const taskData = { ...data, userId: user.id, categoryId: category.id };
+    return await prisma.task.create({ data: taskData });
   };
 
   public findMany = async (userId: number, name?: string) => {
-    if (userId) {
-      return await prisma.task.findMany({ where: { userId } });
-    }
     if (name) {
+      const category = await prisma.category.findFirst({ where: { name } });
+      if (!category) {
+        return null;
+      }
+
       return await prisma.task.findMany({
         include: { category: true },
-        where: { category: { name } },
+        where: { userId: userId, category: { name } },
+      });
+    }
+
+    if (userId) {
+      return await prisma.task.findMany({
+        where: { userId },
+        include: { category: true },
       });
     }
 
@@ -28,20 +64,20 @@ export class TaskService {
     });
 
     if (!response) {
-      throw new AppError("This user is not the task owner", 403);
+      return null;
     }
 
     return response;
   };
 
   public update = async (id: number, data: taskUpdate, userId: number) => {
-    const findTask = await prisma.task.findFirst({ where: { id, userId } });
+    const findUser = await prisma.task.findFirst({ where: { id, userId } });
 
-    if (findTask) {
+    if (findUser) {
       return await prisma.task.update({ where: { id }, data });
     }
 
-    throw new AppError("This user is not the task owner", 403);
+    return null;
   };
 
   public delete = async (id: number, userId: number) => {
@@ -51,6 +87,6 @@ export class TaskService {
       return await prisma.task.delete({ where: { id } });
     }
 
-    throw new AppError("This user is not the task owner", 403);
+    return null;
   };
 }

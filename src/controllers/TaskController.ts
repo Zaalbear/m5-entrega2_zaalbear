@@ -6,23 +6,52 @@ export class TaskController {
   private taskService = new TaskService();
 
   public create = async (req: Request, res: Response) => {
-    const body = { ...req.body, userId: res.locals.token.id };
+    const body = req.body;
+    const userId = req.body.userId;
+    const categoryId = req.body.categoryId;
 
-    const category = await prisma.category.findFirst({
-      where: { id: body.categoryId },
-    });
+    if (!categoryId) {
+      const response = await this.taskService.create(body, userId);
+      if (response) {
+        return res.status(200).json(response);
+      }
 
-    if (category?.userId === body.userId) {
-      const response = await this.taskService.create(body);
-
-      return res.status(201).json(response);
+      return res
+        .status(403)
+        .json({ message: "This user is not the task owner" });
     }
 
-    console.log(category);
+    if (categoryId) {
+      const category = await prisma.category.findFirst({ where: { userId } });
 
-    return res
-      .status(404)
-      .json({ message: "This user is not the category owner" });
+      if (category) {
+        const response = await this.taskService.create(
+          body,
+          userId,
+          categoryId
+        );
+
+        if (response) {
+          return res.status(200).json(response);
+        }
+
+        return res
+          .status(403)
+          .json({ message: "This user is not the category owner" });
+      }
+
+      return res.status(404).json({ message: "Category not found" });
+    } else {
+      const response = await this.taskService.create(body, userId);
+
+      if (response) {
+        return res.status(200).json(response);
+      }
+
+      return res
+        .status(403)
+        .json({ message: "This user is not the category owner" });
+    }
   };
 
   public findMany = async ({ query }: Request, res: Response) => {
@@ -30,23 +59,21 @@ export class TaskController {
     const userId = res.locals.token.id;
     const taskList = await this.taskService.findMany(userId, queryParams);
 
-    if (queryParams) {
-      const foundCategory = await prisma.task.findFirst({
-        where: { category: { name: String(queryParams) } },
-      });
-
-      if (!foundCategory) {
-        return res.status(404).json({ message: "Category not found" });
-      }
+    if (!taskList) {
+      return res.status(404).json({ message: "Category not found" });
     }
 
-    return res.status(200).json({ taskList });
+    return res.status(200).json(taskList);
   };
 
   public findById = async (req: Request, res: Response) => {
     const taskId = Number(req.params.id);
     const userId = res.locals.token.id;
     const findTask = await this.taskService.findById(taskId, userId);
+
+    if (!findTask){
+      return res.status(403).json({ message: "User is not the task owner" })
+    }
     return res.status(200).json(findTask);
   };
 
@@ -55,16 +82,23 @@ export class TaskController {
     const userId = res.locals.token.id;
 
     const taskBody = req.body;
-    const task = await this.taskService.update(taskId, taskBody, userId);
+    const response = await this.taskService.update(taskId, taskBody, userId);
 
-    return res.status(200).json(task);
+    if (!response){
+      return res.status(403).json({ message: "User is not the task owner" })
+    }
+    return res.status(200).json(response);
   };
 
   public delete = async (req: Request, res: Response) => {
     const taskId = Number(req.params.id);
     const userId = res.locals.token.id;
 
-    await this.taskService.delete(taskId, userId);
+    const response = await this.taskService.delete(taskId, userId);
+
+    if (!response){
+      return res.status(403).json({ message: "User is not the task owner" })
+    }
 
     return res.status(204).json();
   };

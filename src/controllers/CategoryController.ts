@@ -20,5 +20,6 @@ export class CategoryController {
     }
 
     return res.status(403).json({ message: "This user is not the category owner" })
+
   };
 }

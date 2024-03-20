@@ -4,20 +4,17 @@ import jwt from "jsonwebtoken";
 class ValidateToken {
   public validateToken = (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
-
     const secret = process.env.JWT_SECRET;
 
     if (token && secret) {
       const isValid = jwt.verify(token, secret);
-      res.locals.token = jwt.decode(token);
-
-      if (isValid){
+      if (isValid) {
+        res.locals.token = jwt.decode(token);
         return next();
       }
-      return res.status(401).json({ message: "Invalid Token" });
+      return res.status(401).json({messsage: "Token is required"})
     }
-
-    return res.status(401).json({ message: "Token is required" });
+    return res.status(401).json({messsage: "Token is required"})
   };
 }
 
