@@ -1,22 +1,19 @@
-import { taskCreate, taskUpdate } from "../interfaces/tasks.interfaces";
+import { taskUpdate } from "../interfaces/tasks.interfaces";
 import { prisma } from "../database/prisma";
-import { taskCreateSchema } from "../schemas/tasks.schemas";
+import { AppError } from "../errors/appError";
 
 export class TaskService {
-  public create = async (data: taskCreate) => {
+  public create = async (data: any) => {
     return await prisma.task.create({ data });
   };
 
-  public findMany = async (name?: string) => {
+  public findMany = async (userId: number, name?: string) => {
+    if (userId) {
+      return await prisma.task.findMany({ where: { userId } });
+    }
     if (name) {
       return await prisma.task.findMany({
-        select: {
-          id: true,
-          title: true,
-          content: true,
-          finished: true,
-          category: true,
-        },
+        include: { category: true },
         where: { category: { name } },
       });
     }
@@ -24,18 +21,36 @@ export class TaskService {
     return await prisma.task.findMany({ include: { category: true } });
   };
 
-  public findById = async (id: number) => {
-    return await prisma.task.findFirst({
-      where: { id },
+  public findById = async (id: number, userId: number) => {
+    const response = await prisma.task.findFirst({
+      where: { id, userId },
       include: { category: true },
     });
+
+    if (!response) {
+      throw new AppError("This user is not the task owner", 403);
+    }
+
+    return response;
   };
 
-  public update = async (id: number, data: taskUpdate) => {
-    return await prisma.task.update({ where: { id }, data });
+  public update = async (id: number, data: taskUpdate, userId: number) => {
+    const findTask = await prisma.task.findFirst({ where: { id, userId } });
+
+    if (findTask) {
+      return await prisma.task.update({ where: { id }, data });
+    }
+
+    throw new AppError("This user is not the task owner", 403);
   };
 
-  public delete = async (id: number) => {
-    return await prisma.task.delete({ where: { id } });
+  public delete = async (id: number, userId: number) => {
+    const findTask = await prisma.task.findFirst({ where: { id, userId } });
+
+    if (findTask) {
+      return await prisma.task.delete({ where: { id } });
+    }
+
+    throw new AppError("This user is not the task owner", 403);
   };
 }
