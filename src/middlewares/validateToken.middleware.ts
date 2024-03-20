@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 class ValidateToken {
   public validateToken = (req: Request, res: Response, next: NextFunction) => {
-    const token = `Bearer ${req.headers.authorization}`;
+    const token = req.headers.authorization;
 
     const secret = process.env.JWT_SECRET;
 

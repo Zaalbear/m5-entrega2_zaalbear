@@ -7,13 +7,7 @@ class ValidateTask {
     (schema: AnyZodObject) =>
     (req: Request, res: Response, next: NextFunction) => {
       req.body = schema.parse(req.body);
-
-      if (!req.body.categoryId) {
-        return res
-          .status(400)
-          .json({ massage: "Category has been not declared" });
-      }
-
+      
       return next();
     };
 
@@ -41,14 +35,15 @@ class ValidateTask {
   ) => {
     const { categoryId } = req.body;
 
-    const foundCategory = await prisma.category.findFirst({
-      where: { id: Number(categoryId) },
-    });
-
-    if (!foundCategory) {
-      return res.status(404).json({ message: "Category not found" });
+    if (categoryId){
+      const foundCategory = await prisma.category.findFirst({
+        where: { id: Number(categoryId) },
+      });
+  
+      if (!foundCategory) {
+        return res.status(404).json({ message: "Category not found" });
+      }
     }
-
     return next();
   };
 

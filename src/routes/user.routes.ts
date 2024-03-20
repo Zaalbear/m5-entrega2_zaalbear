@@ -17,4 +17,4 @@ userRouter.post(
   validate.validateUserBody(userLoginSchema),
   userControler.login
 );
-userRouter.get("/profile", validateToken.validateToken, userControler.get);
+userRouter.get("/profile", userControler.get);
